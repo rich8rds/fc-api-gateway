@@ -1,0 +1,102 @@
+services:
+  api-gateway:
+    build: ./
+    container_name: api-gateway
+    ports:
+      - "4081:4081"
+    expose:
+      - "4081"
+    networks:
+      - fcNet
+      - dbNet
+      - notificationsNet
+    env_file:
+      - ./.env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=${SPRING_CONFIG_IMPORT}
+      - OTEL_TRACES_EXPORTER=${OTEL_TRACES_EXPORTER}
+      - OTEL_METRICS_EXPORTER=${OTEL_METRICS_EXPORTER}
+      - OTEL_LOGS_EXPORTER=${OTEL_LOGS_EXPORTER}
+      - OTEL_METRIC_EXPORT_INTERVAL=${OTEL_METRIC_EXPORT_INTERVAL}
+      - TZ=${TIMEZONE}
+      - EUREKA_HOSTNAME=${EUREKA_HOSTNAME}
+    restart: on-failure
+
+  fc-rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: fc-rabbitmq
+    networks:
+      - notificationsNet
+    ports:
+      - ${RABBITMQ_PORT}
+      - ${RABBITMQ_MANAGEMENT_PORT}
+    env_file:
+      - ./.env
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - ./.volumes/rabbitmq:/var/lib/rabbitmq/mnesia
+    restart: on-failure
+
+  postgresdb:
+    image: postgres:13
+    container_name: postgresdb
+    networks:
+      - dbNet
+    env_file:
+      - ./.env
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_PORT}
+    volumes:
+      - ./.volumes/pgdata:/var/lib/postgresql/data
+    restart: on-failure
+
+
+  redis-cache:
+    image: redis:7.4.1
+    container_name: redis-cache
+    hostname: redis-cache
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./.volumes/redis:/var/lib/redis
+    env_file:
+      - ./.env
+    networks:
+      - notificationsNet
+    restart: on-failure
+
+
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander
+    env_file:
+      - ./.env
+    environment:
+      - REDIS_HOSTS=redis
+    networks:
+      - notificationsNet
+    ports:
+      - ${REDIS_COMMANDER_PORT}
+    restart: on-failure
+
+
+
+networks:
+  fcNet:
+    name: fcNet
+    external: true
+    driver: bridge
+  dbNet:
+    name: dbNet
+    driver: bridge
+  notificationsNet:
+    name: notificationsNet
+    driver: bridge

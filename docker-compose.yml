@@ -1,0 +1,25 @@
+services:
+  api-gateway:
+    image: "${ECR_SERVER}/${ECR_REPOSITORY}:api-gateway-${ENV}-${DATE}-${SHORT_SHA}"
+#    build: ./
+    container_name: api-gateway
+    ports:
+      - "4081:4081"
+    expose:
+      - "4081"
+    networks:
+      - fcNet
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - OTEL_TRACES_EXPORTER=logging
+      - OTEL_METRICS_EXPORTER=logging
+      - OTEL_LOGS_EXPORTER=logging
+      - OTEL_METRIC_EXPORT_INTERVAL=15000
+      - TZ=Africa/Lagos
+      - EUREKA_HOSTNAME=discovery-service
+
+networks:
+  fcNet:
+    name: fcNet
+    external: true
+    driver: bridge
