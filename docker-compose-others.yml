@@ -1,28 +1,4 @@
 services:
-  api-gateway:
-    build: ./
-    container_name: api-gateway
-    ports:
-      - "4081:4081"
-    expose:
-      - "4081"
-    networks:
-      - fcNet
-      - dbNet
-      - notificationsNet
-    env_file:
-      - ./.env
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=${SPRING_CONFIG_IMPORT}
-      - OTEL_TRACES_EXPORTER=${OTEL_TRACES_EXPORTER}
-      - OTEL_METRICS_EXPORTER=${OTEL_METRICS_EXPORTER}
-      - OTEL_LOGS_EXPORTER=${OTEL_LOGS_EXPORTER}
-      - OTEL_METRIC_EXPORT_INTERVAL=${OTEL_METRIC_EXPORT_INTERVAL}
-      - TZ=${TIMEZONE}
-      - EUREKA_HOSTNAME=${EUREKA_HOSTNAME}
-    restart: on-failure
-
   fc-rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: fc-rabbitmq
@@ -38,13 +14,15 @@ services:
       - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     volumes:
       - ./.volumes/rabbitmq:/var/lib/rabbitmq/mnesia
-    restart: on-failure
+    restart: always
+
 
   postgresdb:
     image: postgres:13
     container_name: postgresdb
     networks:
       - dbNet
+      - jaegerNet
     env_file:
       - ./.env
     environment:
@@ -53,9 +31,11 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - ${POSTGRES_PORT}
+    expose:
+      - ${POSTGRES_PORT}
     volumes:
       - ./.volumes/pgdata:/var/lib/postgresql/data
-    restart: on-failure
+    restart: always
 
 
   redis-cache:
@@ -63,7 +43,7 @@ services:
     container_name: redis-cache
     hostname: redis-cache
     ports:
-      - ${REDIS_PORT}:6379
+      - ${REDIS_PORT}
     volumes:
       - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
       - ./.volumes/redis:/var/lib/redis
@@ -71,7 +51,7 @@ services:
       - ./.env
     networks:
       - notificationsNet
-    restart: on-failure
+    restart: always
 
 
   redis-commander:
@@ -85,7 +65,27 @@ services:
       - notificationsNet
     ports:
       - ${REDIS_COMMANDER_PORT}
-    restart: on-failure
+    restart: always
+
+
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+#      - "5775:5775/udp"
+#      - "6831:6831/udp"
+#      - "6832:6832/udp"
+#      - "5778:5778"
+      - "16686:16686" # Jaeger UI
+#      - "14268:14268" # Jaeger Collector HTTP
+      - "14250:14250" # Jaeger gRPC Collector
+#      - "9411:9411" # Zipkin compatible endpoint
+    environment:
+#      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - jaegerNet
+    restart: always
 
 
 
@@ -99,4 +99,7 @@ networks:
     driver: bridge
   notificationsNet:
     name: notificationsNet
+    driver: bridge
+  jaegerNet:
+    name: jaegerNet
     driver: bridge

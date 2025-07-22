@@ -18,7 +18,6 @@ import com.favourite.collections.commons.useradmin.repository.AppUserRepository;
 import com.favourite.collections.commons.useradmin.repository.TokenRepository;
 import com.favourite.collections.commons.useradmin.util.AppContextUser;
 import com.favourite.collections.commons.useradmin.util.TokenGenerator;
-import com.favourite.collections.feign.UserClient;
 import com.favourite.collections.service.AuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -51,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
 	private final AppContextUser appContextUser;
 	private final TokenGenerator tokenGenerator;
 
-	private final UserClient userClient;
+	//private final UserClient userClient;
 
 
 	@Override
@@ -258,36 +256,37 @@ public class AuthServiceImpl implements AuthService {
 //				.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
 //				.map(ResponseEntity::getBody);
 
-		Mono<RoleResponseData> roleResponseDataMono = Mono.fromCallable(() -> userClient.findRoleByName(roleName, false))
-				.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
-				.map(ResponseEntity::getBody);
+//		Mono<RoleResponseData> roleResponseDataMono = Mono.fromCallable(() -> userClient.findRoleByName(roleName, false))
+//				.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
+//				.map(ResponseEntity::getBody);
+//
+//		//ResponseEntity<RoleResponseData> roleResponseData = this.userClient.findRoleByName(roleName, false);
+//
+//		roleResponseDataMono.map(role -> {
+//			String roleNameString = role.getName();
+//			// ... do something with roleName
+//			//log.info("roleName: {}", roleNameString);
+//			if(roleNameString == null) {
+//				Mono<RoleResponseData> roleResponseDataMono2 = Mono.fromCallable(() -> userClient.findRoleByName("CUSTOMER", false))
+//						.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
+//						.map(ResponseEntity::getBody);
+//
+//				roleResponseDataMono.map(role2 -> {
+//					String roleNameString2 = role.getName();
+//					// ... do something with roleName
+//					if(roleNameString2 == null) {
+//						throw new AbstractPlatformException("error.infrastructure.role.not.found", "Role not found!");
+//					}
+//					//log.info("role2: {}", role2);
+//					return role2;
+//				});
+//			}
+//			//log.info("role: {}", role);
+//			return role;
+//		}).onErrorResume(Mono::error);
 
-		//ResponseEntity<RoleResponseData> roleResponseData = this.userClient.findRoleByName(roleName, false);
 
-		roleResponseDataMono.map(role -> {
-			String roleNameString = role.getName();
-			// ... do something with roleName
-			//log.info("roleName: {}", roleNameString);
-			if(roleNameString == null) {
-				Mono<RoleResponseData> roleResponseDataMono2 = Mono.fromCallable(() -> userClient.findRoleByName("CUSTOMER", false))
-						.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
-						.map(ResponseEntity::getBody);
-
-				roleResponseDataMono.map(role2 -> {
-					String roleNameString2 = role.getName();
-					// ... do something with roleName
-					if(roleNameString2 == null) {
-						throw new AbstractPlatformException("error.infrastructure.role.not.found", "Role not found!");
-					}
-					//log.info("role2: {}", role2);
-					return role2;
-				});
-			}
-			//log.info("role: {}", role);
-			return role;
-		}).onErrorResume(Mono::error);
-
-
-		return roleResponseDataMono;
+		//return roleResponseDataMono;
+		return Mono.just(new RoleResponseData());
 	}
 }

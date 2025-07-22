@@ -1,7 +1,7 @@
 services:
   api-gateway:
-    image: "${ECR_SERVER}/${ECR_REPOSITORY}:api-gateway-${ENV}-${DATE}-${SHORT_SHA}"
-#    build: ./
+    build: ./
+#    image: ${ECR_REPOSITORY}/fc-api-gateway:latest
     container_name: api-gateway
     ports:
       - "4081:4081"
@@ -9,17 +9,36 @@ services:
       - "4081"
     networks:
       - fcNet
+      - dbNet
+      - jaegerNet
+      - notificationsNet
+    env_file:
+      - ./.env
     environment:
+      - OTEL_SERVICE_NAME=api-gateway
       - SPRING_PROFILES_ACTIVE=docker
-      - OTEL_TRACES_EXPORTER=logging
-      - OTEL_METRICS_EXPORTER=logging
-      - OTEL_LOGS_EXPORTER=logging
-      - OTEL_METRIC_EXPORT_INTERVAL=15000
-      - TZ=Africa/Lagos
-      - EUREKA_HOSTNAME=discovery-service
+      - OTEL_TRACES_EXPORTER=${OTEL_TRACES_EXPORTER}
+      - OTEL_METRICS_EXPORTER=${OTEL_METRICS_EXPORTER}
+      - OTEL_LOGS_EXPORTER=${OTEL_LOGS_EXPORTER}
+      - OTEL_METRIC_EXPORT_INTERVAL=${OTEL_METRIC_EXPORT_INTERVAL}
+      - TZ=${TIMEZONE}
+
+
 
 networks:
   fcNet:
     name: fcNet
+    external: true
+    driver: bridge
+  dbNet:
+    name: dbNet
+    external: true
+    driver: bridge
+  notificationsNet:
+    name: notificationsNet
+    external: true
+    driver: bridge
+  jaegerNet:
+    name: jaegerNet
     external: true
     driver: bridge
