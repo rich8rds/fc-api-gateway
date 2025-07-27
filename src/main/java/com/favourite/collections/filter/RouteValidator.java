@@ -31,10 +31,12 @@ public class RouteValidator {
 		openApiEndpoints.put("/api/v1/user-service/states/product-service", List.of(ALL.name()));
 		openApiEndpoints.put("/v2/api-docs", List.of(ALL.name()));
 		openApiEndpoints.put("/v3/api-docs", List.of(ALL.name()));
+		openApiEndpoints.put("/v3/api-docs/swagger-config", List.of(ALL.name()));
 		openApiEndpoints.put("/notifications-service/v3/api-docs", List.of(ALL.name()));
 		openApiEndpoints.put("/user-service/v3/api-docs", List.of(ALL.name()));
 		openApiEndpoints.put("/user-service/**", List.of(ALL.name()));
 		openApiEndpoints.put("/product-service/v3/api-docs", List.of(ALL.name()));
+		openApiEndpoints.put("/dashboard-service/v3/api-docs", List.of(ALL.name()));
 		openApiEndpoints.put("/configuration", List.of(ALL.name()));
 		openApiEndpoints.put("/swagger/**", List.of(ALL.name()));
 		openApiEndpoints.put("/swagger-ui/**", List.of(ALL.name()));

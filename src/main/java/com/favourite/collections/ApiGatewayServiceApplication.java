@@ -1,6 +1,7 @@
 /* Collections #2024 */
 package com.favourite.collections;
 
+import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,10 +11,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.web.reactive.config.EnableWebFlux;
 
 @SpringBootApplication
-@OpenAPIDefinition
 @EnableDiscoveryClient
 @EnableWebFlux
 @EnableFeignClients
+@OpenAPIDefinition(info = @Info(title = "API Gateway", version = "1.0", description = "Documentation API Gateway v1.0"))
 public class ApiGatewayServiceApplication {
 
 	public static void main(String[] args) {

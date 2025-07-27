@@ -1,6 +1,7 @@
 services:
   api-gateway:
-    image: ${ECR_REPOSITORY}/fc-api-gateway:latest
+    build: ./
+    #    image: ${ECR_REPOSITORY}/fc-api-gateway:latest
     container_name: api-gateway
     ports:
       - "4081:4081"
@@ -21,7 +22,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT}
       OTEL_METRIC_EXPORT_INTERVAL: ${OTEL_METRIC_EXPORT_INTERVAL}
 
-  postgresdb:
+  postgres:
     container_name: postgresdb
     image: postgres:latest
     restart: always
