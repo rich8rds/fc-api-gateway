@@ -1,7 +1,6 @@
 services:
   api-gateway:
-    build: ./
-    #    image: ${ECR_REPOSITORY}/fc-api-gateway:latest
+    image: ${ECR_REPOSITORY}/fc-api-gateway:1.0.0
     container_name: api-gateway
     ports:
       - "4081:4081"
