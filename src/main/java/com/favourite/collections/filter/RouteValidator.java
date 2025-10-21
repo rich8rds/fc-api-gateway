@@ -24,14 +24,14 @@ public class RouteValidator {
 		openApiEndpoints.put("/css", List.of(ALL.name()));
 		openApiEndpoints.put("/js", List.of(ALL.name()));
 		openApiEndpoints.put("/actuator/info", List.of(ALL.name()));
-		openApiEndpoints.put("/actuator/**", List.of(ALL.name()));
-		openApiEndpoints.put("/api/v1/auth/**", List.of(ALL.name()));
-		openApiEndpoints.put("/api/v1/notifications", List.of(ALL.name()));
-		openApiEndpoints.put("/api/v1/notifications/**", List.of(ALL.name()));
+		openApiEndpoints.put("/actuator/.*", List.of(ALL.name()));
+		openApiEndpoints.put("/api/v1/auth/.*", List.of(ALL.name()));
+		openApiEndpoints.put("/api/v1/notifications/.*", List.of(ALL.name()));
+		//openApiEndpoints.put("/api/v1/notifications/**", List.of(ALL.name()));
 		openApiEndpoints.put("/api/v1/user-service/states/product-service", List.of(ALL.name()));
 		openApiEndpoints.put("/v2/api-docs", List.of(ALL.name()));
-		openApiEndpoints.put("/v3/api-docs", List.of(ALL.name()));
-		openApiEndpoints.put("/v3/api-docs/swagger-config", List.of(ALL.name()));
+		openApiEndpoints.put("/v3/api-docs/.*", List.of(ALL.name()));
+		//openApiEndpoints.put("/v3/api-docs/swagger-config", List.of(ALL.name()));
 		openApiEndpoints.put("/notifications-service/v3/api-docs", List.of(ALL.name()));
 		openApiEndpoints.put("/user-service/v3/api-docs", List.of(ALL.name()));
 		openApiEndpoints.put("/user-service/**", List.of(ALL.name()));
@@ -39,8 +39,8 @@ public class RouteValidator {
 		openApiEndpoints.put("/dashboard-service/v3/api-docs", List.of(ALL.name()));
 		openApiEndpoints.put("/configuration", List.of(ALL.name()));
 		openApiEndpoints.put("/swagger/**", List.of(ALL.name()));
-		openApiEndpoints.put("/swagger-ui/**", List.of(ALL.name()));
-		openApiEndpoints.put("/webjars/**", List.of(ALL.name()));
+		openApiEndpoints.put("/swagger-ui/.*", List.of(ALL.name()));
+		openApiEndpoints.put("/webjars/.*", List.of(ALL.name()));
 		openApiEndpoints.put("/swagger-ui.html", List.of(ALL.name()));
 		openApiEndpoints.put("/eureka", List.of(ALL.name()));
 	}

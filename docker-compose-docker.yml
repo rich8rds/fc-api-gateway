@@ -14,7 +14,6 @@ services:
       - ./.env
     environment:
       TZ: ${TIMEZONE}
-      OTEL_SERVICE_NAME: "api-gateway"
       SPRING_PROFILES_ACTIVE: "docker"
       OTEL_RESOURCE_ATTRIBUTES: ${OTEL_RESOURCE_ATTRIBUTES}
       OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL}
@@ -43,12 +42,9 @@ networks:
   fcNet:
     name: fcNet
     external: true
-    driver: bridge
   notificationsNet:
     name: notificationsNet
     external: true
-    driver: bridge
   jaegerNet:
     name: jaegerNet
     external: true
-    driver: bridge
