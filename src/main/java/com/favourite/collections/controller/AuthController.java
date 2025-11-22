@@ -5,7 +5,6 @@ import com.favourite.collections.commons.useradmin.data.ChangePasswordData;
 import com.favourite.collections.commons.useradmin.data.ForgotPasswordData;
 import com.favourite.collections.commons.useradmin.data.LoginData;
 import com.favourite.collections.commons.useradmin.data.RegistrationData;
-import com.favourite.collections.commons.useradmin.data.RoleResponseData;
 import com.favourite.collections.commons.useradmin.data.UpdatePasswordData;
 import com.favourite.collections.commons.useradmin.exception.ConstraintValidationException;
 import com.favourite.collections.service.AuthService;
@@ -13,7 +12,6 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
