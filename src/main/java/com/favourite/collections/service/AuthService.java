@@ -23,5 +23,5 @@ public interface AuthService {
 
 	ResponseEntity<CommandResult> changePasswordWithToken(String token, ChangePasswordData changePasswordData);
 
-	Mono<RoleResponseData>  test(String roleName);
+	Mono<RoleResponseData> test(String roleName);
 }

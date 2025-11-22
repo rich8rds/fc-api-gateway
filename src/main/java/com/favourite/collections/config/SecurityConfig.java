@@ -1,7 +1,6 @@
 /* Collections #2025 */
 package com.favourite.collections.config;
 
-import com.favourite.collections.filter.RouteValidator;
 import com.favourite.collections.filter.WebSecurityFilter;
 import com.favourite.collections.service.impl.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -27,19 +26,28 @@ import java.security.SecureRandom;
 public class SecurityConfig {
 
 	 private final WebSecurityFilter webSecurityFilter;
-	 private final RouteValidator routeValidator;
 	 private final AppUserDetailsService appUserDetailsService;
 
 	@Bean
 	public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) {
 
 		http.csrf(ServerHttpSecurity.CsrfSpec::disable).cors(Customizer.withDefaults())
-				.authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec
-						.pathMatchers(routeValidator.openApiEndpoints.keySet()
-								.toArray(String[]::new)).permitAll()
+				.authorizeExchange(authorizeExchangeSpec -> authorizeExchangeSpec.pathMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/index.html",
+                        "/swagger-ui/**",
+                        "/actuator/**",
+                        "/api/v1/auth/**",
+                        "/notifications-service/v3/api-docs",
+                        "/product-service/v3/api-docs",
+                        "/user-service/v3/api-docs",
+                        "/dashboard-service/v3/api-docs"
+                ).permitAll()
 						.anyExchange().authenticated())
 				.exceptionHandling(handler -> handler.authenticationEntryPoint(new AuthEntryPoint()))
-				.addFilterAt(webSecurityFilter, SecurityWebFiltersOrder.AUTHORIZATION);
+				.addFilterAt(webSecurityFilter, SecurityWebFiltersOrder.AUTHORIZATION)
+         ;
 
 		return http.build();
 	}

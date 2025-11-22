@@ -12,12 +12,15 @@ import com.favourite.collections.commons.useradmin.data.RegistrationData;
 import com.favourite.collections.commons.useradmin.data.RoleResponseData;
 import com.favourite.collections.commons.useradmin.data.UpdatePasswordData;
 import com.favourite.collections.commons.useradmin.domain.AppUser;
+import com.favourite.collections.commons.useradmin.domain.Cart;
+import com.favourite.collections.commons.useradmin.domain.Role;
 import com.favourite.collections.commons.useradmin.domain.Token;
 import com.favourite.collections.commons.useradmin.exception.ConstraintValidationException;
 import com.favourite.collections.commons.useradmin.repository.AppUserRepository;
 import com.favourite.collections.commons.useradmin.repository.TokenRepository;
 import com.favourite.collections.commons.useradmin.util.AppContextUser;
 import com.favourite.collections.commons.useradmin.util.TokenGenerator;
+import com.favourite.collections.feign.UserClient;
 import com.favourite.collections.service.AuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -48,8 +51,7 @@ public class AuthServiceImpl implements AuthService {
 	private final PasswordEncoder passwordEncoder;
 	private final AppContextUser appContextUser;
 	private final TokenGenerator tokenGenerator;
-
-	//private final UserClient userClient;
+	private final UserClient userClient;
 
 
 	@Override
@@ -65,31 +67,24 @@ public class AuthServiceImpl implements AuthService {
 						"error.user.not.verified.or.active: Check your email to be verified!");
 			}
 			if (!user.isAccountNonLocked()) {
-				throw new AbstractPlatformException("error.message.invalid.account",
-						"Please contact the administrator");
+				throw new UsernameNotFoundException("Invalid Account. Please contact the administrator");
 			}
 
 			return authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(loginData.getEmail(), loginData.getPassword())).map(
 							authentication -> {
 							String token = this.jwtConfig.generateToken(authentication);
-							//log.info("Generated token for login: {}", token);
 							return ResponseEntity.ok(new CommandResultBuilder().response("Login Successful")
 									.token(token).build());
 					}
-			).onErrorResume(err -> {
-				//log.error(err.getMessage());
-				return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-						.body(new CommandResultBuilder().response("Invalid credentials")
-						.build()));
-			});
+			).onErrorResume(err -> Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new CommandResultBuilder().response("Invalid credentials")
+                    .build())));
 
 		} catch (BadCredentialsException e) {
-			//log.error("LogInUserError: {}", e.getMessage(), e);
 			throw new AbstractPlatformException("error.msg.auth.login", "Incorrect username or password", 401);
 		} catch (UsernameNotFoundException e) {
-			//log.info("User not found: {}", e.getMessage());
-			throw new AbstractPlatformException("error.msg.auth.login", "Incorrect username or password", 404);
+			throw new AbstractPlatformException("error.msg.auth.login", e.getMessage(), 404);
 		}
 	}
 
@@ -102,7 +97,6 @@ public class AuthServiceImpl implements AuthService {
 		String lastname = registerData.getLastname();
 		String phoneNumber = registerData.getPhoneNumber();
 		String password = registerData.getPassword();
-		String roleName = registerData.getRoleName();
 
 		boolean existsByEmail = this.appUserRepository.existsByEmail(email);
 		if (BooleanUtils.isTrue(existsByEmail)) {
@@ -110,24 +104,26 @@ public class AuthServiceImpl implements AuthService {
 					"User with email " + email + " already exists", 409);
 		}
 
-//		ResponseEntity<RoleResponseData> roleResponseData = this.userClient.findRoleByName(roleName, false);
-//
-//		if(roleResponseData.hasBody()) {
-//			RoleResponseData role = roleResponseData.getBody();
-//			if(role == null) {
-//				roleResponseData = this.userClient.findRoleByName("CUSTOMER", false);
-//				if(roleResponseData.hasBody()) {
-//					 role = roleResponseData.getBody();
-//				} else {
-//					throw new AbstractPlatformException("error.infrastructure.role.not.found", "Role not found!");
-//				}
-//			}
-//		}
+        Mono<RoleResponseData> roleResponseData = this.userClient.findRoleByName("CUSTOMER", false);
+        Role role = new Role();
+        roleResponseData.map(data -> {
+            role.setId(data.getId());
+            role.setName(data.getName());
+            role.setDescription(data.getDescription());
+            role.setPermissions(data.getPermissions());
+            role.setIsDisabled(data.getIsDisabled());
+            return data;
+        }).subscribe();
 
 		// todo: Create and add cart
-		AppUser newAppuser = AppUser.builder().email(email).firstname(firstname).lastname(lastname).phoneNo(phoneNumber)
+		AppUser newAppuser = AppUser.builder()
+                .email(email)
+                .firstname(firstname)
+                .lastname(lastname)
+                .phoneNo(phoneNumber)
 				.password(passwordEncoder.encode(password))
-				.role(null).build();
+				.role(role)
+            .build();
 
 		newAppuser = this.appUserRepository.save(newAppuser);
 
@@ -148,8 +144,8 @@ public class AuthServiceImpl implements AuthService {
 		AppUser appUser = appUserRepository.findById(id == null ? 0L : id)
 				.orElseThrow(() -> new UsernameNotFoundException("User with email does not exist"));
 
-		appUser.setVerified(true);
-		appUser.setActive(true);
+		appUser.setIsVerified(true);
+		appUser.setIsActive(true);
 		appUserRepository.save(appUser);
 
 		tokenRepository.delete(verificationToken);
@@ -287,6 +283,7 @@ public class AuthServiceImpl implements AuthService {
 
 
 		//return roleResponseDataMono;
-		return Mono.just(new RoleResponseData());
+        Mono<RoleResponseData> roleResponseData = this.userClient.findRoleByName(roleName, false);
+        return roleResponseData;
 	}
 }
