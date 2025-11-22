@@ -12,7 +12,6 @@ import com.favourite.collections.commons.useradmin.data.RegistrationData;
 import com.favourite.collections.commons.useradmin.data.RoleResponseData;
 import com.favourite.collections.commons.useradmin.data.UpdatePasswordData;
 import com.favourite.collections.commons.useradmin.domain.AppUser;
-import com.favourite.collections.commons.useradmin.domain.Cart;
 import com.favourite.collections.commons.useradmin.domain.Role;
 import com.favourite.collections.commons.useradmin.domain.Token;
 import com.favourite.collections.commons.useradmin.exception.ConstraintValidationException;
@@ -245,45 +244,4 @@ public class AuthServiceImpl implements AuthService {
 				.response("Password Successfully Changed!").build());
 	}
 
-	@Override
-	public Mono<RoleResponseData>  test(String roleName) {
-
-//		Mono<RoleResponseData> roleResponseDataMono = Mono.fromCallable(() -> userClient.findRoleById(1L, false))
-//				.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
-//				.map(ResponseEntity::getBody);
-
-//		Mono<RoleResponseData> roleResponseDataMono = Mono.fromCallable(() -> userClient.findRoleByName(roleName, false))
-//				.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
-//				.map(ResponseEntity::getBody);
-//
-//		//ResponseEntity<RoleResponseData> roleResponseData = this.userClient.findRoleByName(roleName, false);
-//
-//		roleResponseDataMono.map(role -> {
-//			String roleNameString = role.getName();
-//			// ... do something with roleName
-//			//log.info("roleName: {}", roleNameString);
-//			if(roleNameString == null) {
-//				Mono<RoleResponseData> roleResponseDataMono2 = Mono.fromCallable(() -> userClient.findRoleByName("CUSTOMER", false))
-//						.subscribeOn(Schedulers.boundedElastic()) // offload to safe thread
-//						.map(ResponseEntity::getBody);
-//
-//				roleResponseDataMono.map(role2 -> {
-//					String roleNameString2 = role.getName();
-//					// ... do something with roleName
-//					if(roleNameString2 == null) {
-//						throw new AbstractPlatformException("error.infrastructure.role.not.found", "Role not found!");
-//					}
-//					//log.info("role2: {}", role2);
-//					return role2;
-//				});
-//			}
-//			//log.info("role: {}", role);
-//			return role;
-//		}).onErrorResume(Mono::error);
-
-
-		//return roleResponseDataMono;
-        Mono<RoleResponseData> roleResponseData = this.userClient.findRoleByName(roleName, false);
-        return roleResponseData;
-	}
 }

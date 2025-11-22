@@ -38,11 +38,6 @@ public class AuthController {
 		return authService.loginUserIn(loginData);
 	}
 
-	@GetMapping("/tests/{roleName}")
-	public Mono<RoleResponseData>  test(@PathVariable(name = "roleName") String roleName) {
-		return authService.test(roleName);
-	}
-
 	@PostMapping("/register")
 	public ResponseEntity<CommandResult> register(@RequestBody @Valid RegistrationData registerData) {
 		if (!registerData.passwordsMatch()) {
